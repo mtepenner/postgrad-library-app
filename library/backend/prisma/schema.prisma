@@ -1,0 +1,68 @@
+// schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  VISITOR
+  ADMIN
+}
+
+model User {
+  id              String            @id @default(uuid())
+  email           String            @unique
+  password        String            // Hashed via bcrypt
+  role            Role              @default(VISITOR)
+  visitorId       String?           @unique // e.g., "VIS-849201"
+  favorites       Favorite[]
+  pickupSchedules Pickup_Schedule[]
+}
+
+model Admin_ID {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Genre {
+  id    String @id @default(uuid())
+  name  String @unique
+  books Book[]
+}
+
+model Book {
+  id              String            @id @default(uuid())
+  title           String
+  author          String
+  genreId         String
+  genre           Genre             @relation(fields: [genreId], references: [id])
+  favorites       Favorite[]
+  pickupSchedules Pickup_Schedule[]
+}
+
+model Favorite {
+  id     String @id @default(uuid())
+  userId String
+  bookId String
+  user   User   @relation(fields: [userId], references: [id])
+  book   Book   @relation(fields: [bookId], references: [id])
+
+  @@unique([userId, bookId]) // Prevents duplicate favorites
+}
+
+model Pickup_Schedule {
+  id         String   @id @default(uuid())
+  userId     String
+  bookId     String
+  pickupDate DateTime
+  status     String   @default("PENDING") // PENDING, FULFILLED, CANCELLED
+  user       User     @relation(fields: [userId], references: [id])
+  book       Book     @relation(fields: [bookId], references: [id])
+}
