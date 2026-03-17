@@ -1,9 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// Import routes (you will create these in the routes folder)
-// import authRoutes from './routes/authRoutes.js';
-// import bookRoutes from './routes/bookRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import bookRoutes from './routes/bookRoutes.js';
 
 dotenv.config();
 
@@ -14,8 +13,8 @@ app.use(cors());
 app.use(express.json()); // Parses incoming JSON requests
 
 // Base Routes
-// app.use('/api/auth', authRoutes);
-// app.use('/api/books', bookRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/books', bookRoutes);
 
 // Health Check
 app.get('/', (req, res) => {
